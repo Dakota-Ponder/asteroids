@@ -8,7 +8,7 @@ from shot import Shot
 
 
 def main():
-    pygame.display.init()
+    pygame.init()
 
 
     
@@ -25,10 +25,11 @@ def main():
     shots = pygame.sprite.Group()
     
     # add instances to the groups   
-    Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
-    AsteroidField.containers = (updatable)
-    Shot.containers = (updatable, drawable)
+    Shot.containers = (shots, updatable, drawable)
+    AsteroidField.containers = updatable
+    asteroid_field = AsteroidField()
+    Player.containers = (updatable, drawable)
     
     
     # x,y coords to spawn player in middle of screen 
@@ -56,21 +57,25 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-        print("Game loop running")
-        # player.draw(screen)
-        # player.update(dt)
-        # Change the game loop to use the new groups instead of the Player object directly.
-        # In other words, iterate over all "updatables" and .update() them, then iterate over
-        # all "drawables" and .draw() them.
+        # print("Game loop running")
+        
         for obj in updatable:
             obj.update(dt)
         
+        # collision check between the player and asteroids
         for asteroid in asteroids:
             if asteroid.collides_with(player):
                 print("Game Over!!!")
                 pygame.quit()
                 sys.exit()
+                
+            for shot in shots:
+                if asteroid.collides_with(shot):
+                    shot.kill()
+                    asteroid.split()
+                    
         
+                
         screen.fill("black")
         
         for obj in drawable:
